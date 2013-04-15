@@ -1,0 +1,93 @@
+$TXT Created by EDWARDS,CHRISTOPHER at OSEHRA.ORG  (KIDS) on Monday, 04/15/13 at 16:25
+=============================================================================
+Run Date: APR 15, 2013                     Designation: XU*8*999
+Package : XU - KERNEL                         Priority: Mandatory
+Version : 8       SEQ #UNK                      Status: Work-In-Progress
+                  Compliance Date:
+=============================================================================
+
+Associated patches:
+
+Subject: ZTMGRSET: Patches > 999
+
+Category: 
+  - Routine
+
+Description:
+============
+
+  This patch removes the restriction of KERNEL patches > 999
+  with ZTMGRSET.
+  
+  JIRA Tickets
+  ==============
+  1. VAF-104  Allow patches >999 to Kernel
+   Resolution: 
+     Remove range checks in ZTMGRSET  
+  
+  Thanks to Test Sites
+  ====================
+    
+  Blood Bank Clearance
+  ====================
+  TBD 
+    
+  Installation Instructions
+  =========================
+  Users should be off the system.
+  Allow KIDS to inhibit new sign-ons.
+  TaskMan does *not* need to be stopped. Should be put in a wait state.
+  ZTMGRSET will rename routines automatically.
+  Installation should take less than a minute.
+   
+  1. Use the 'INSTALL/CHECK MESSAGE' option on the PackMan menu.  
+     This option will load the KIDS package onto your system.  
+    
+  2. The patch has now been loaded into a transport global on your 
+     system. You now need to use KIDS to install the transport global.  
+     
+  3. On the KIDS menu, under the 'Installation' menu, use the 
+     following options: 
+          Print Transport Global 
+          Compare Transport Global to Current System 
+          Verify Checksums in Transport Global
+          Backup a Transport Global 
+    
+  4. On the KIDS menu, under the 'Installation' menu, use the
+     following option: 
+          Select Installation Option: Install Package(s) 
+          Select INSTALL NAME: XU*8.0*999
+                               ==========
+ 
+       Want KIDS to INHIBIT LOGONs during the install? NO// YES
+       Want to DISABLE Scheduled Options, Menu Options, and Protocols? NO//
+          
+  Post-Installation
+  =================
+  The Post Install routine POST^XU8P999 will call ZTMGRSET.  This will
+  resave OS specific routines as necessary
+ 
+ 
+ 
+ 
+
+Routine Information:
+====================
+The second line of each of these routines now looks like:
+ ;;8.0;KERNEL;**[Patch List]**;Jul 10, 1995;Build 6
+
+The checksums below are new checksums, and
+ can be checked with CHECK1^XTSUMBLD.
+
+Routine Name: XU8P584
+    Before: n/a         After: B32081    **999**
+Routine Name: ZTMGRSET
+    Before: TBD         After: B54876297 **34,36,69,94,121,127,136,191,
+                                           275,355,446,998**
+ 
+=============================================================================
+User Information:
+Entered By  : EDWARDS,CHRISTOPHER           Date Entered  : APR 15, 2013
+Completed By:                               Date Completed:
+Released By :                               Date Released :
+=============================================================================
