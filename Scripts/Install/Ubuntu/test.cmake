@@ -1,6 +1,11 @@
 set(CTEST_SITE "$ENV{buildid}.vagrant")
 set(CTEST_BUILD_NAME "Ubuntu12.04-GTMV6.0-002(x86)")
 
+set(dashboard_git_url "https://github.com/ChristopherEdwards/VistA.git")
+set(dashboard_git_branch "addXINDEXTestFlag")
+
+set(TEST_VISTA_XINDEX OFF)
+
 set(dashboard_CMakeCache "#Path to a program.
 CMAKE_MAKE_PROGRAM:FILEPATH=/usr/bin/make
 #Value Computed by CMake
@@ -76,6 +81,7 @@ TEST_VISTA_SETUP_UCI_NAME:STRING=PLA
 TEST_VISTA_SETUP_VOLUME_SET:STRING=PLA
 #Use warnings as a failure condition for XINDEX tests?
 TEST_VISTA_XINDEX_WARNINGS_AS_FAILURES:BOOL=OFF
+TEST_VISTA_XINDEX:BOOL=OFF
 #Value Computed by CMake
 #VISTA_BINARY_DIR:STATIC=/home/vagrant/VistA/target
 #Value Computed by CMake
