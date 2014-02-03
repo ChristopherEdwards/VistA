@@ -22,12 +22,9 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Update the server from repositories
-# TODO: kill output
-# TODO: log status
-# TODO: determine if this needs to be logged
-apt-get -y update
-apt-get -y upgrade
+apt-get -y -qq update
+apt-get -y -qq upgrade
 
 # Install baseline packages
 # TODO: detect virtualbox and install additions?
-apt-get install -y git xinetd perl wget ssh
+apt-get install -y -qq git xinetd perl wget ssh

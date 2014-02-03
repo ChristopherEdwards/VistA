@@ -29,32 +29,27 @@
 #                    Includes starting TaskMan.
 ### END INIT INFO
 
-# TODO: add RHEL specific options
-# TODO: add Ubuntu specific options
-
+# this is a "softcode" when a VistA instance is created this line will be
+# replace with the right instance
 instance="FOIA"
 
 # setup environment variables
-source /opt/$instance/etc/env
+# "softcoded" path as we don't know where the env script is
+# replaced when a vista instance is created
+source /home/$instance/etc/env
 
 # Start VistA background tasks
 start() {
     # TODO: logging
 
-    # Check to see if database is clean
-    # TODO: check here
-
-    #if(!clean)
-    #   echo "DATABASE IS NOT CLEAN!"
-    #   echo "Trying auto recovery (mupip recover --backwards)
-    #   $gtm_dist/mupip journal -recover -backward /opt/$instance/$gtmver/j/$instacne.mjl
+    # If a database is shutdown cleanly there shouldn't be anything in the
+    # journals to replay, so we can run this without worry
+    echo "Ensuring a consistant database (mupip recover -backward)"
+    $gtm_dist/mupip journal -recover -backward $basedir/j/$instacne.mjl >> $basedir/log/journalRecovery.log 2>&1
     #fi
 
     # Start TaskMan
     $gtm_dist/mumps -run START^ZTMB
-
-    # Others? MailMan?
-    # HL7, VistALink, RPC Broker are all handled by xinetd
 }
 stop() {
     # TODO: logging

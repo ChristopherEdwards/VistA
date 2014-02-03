@@ -43,7 +43,7 @@ usage()
 EOF
 }
 
-while getopts "i:" option
+while getopts ":hi:" option
 do
     case $option in
         h)
@@ -195,7 +195,7 @@ chmod +x $basedir/bin/tied.sh
 # Create Global mapping
 # Thanks to Sam Habiel, Gus Landis, and others for the inital values
 echo "c -s DEFAULT    -ACCESS_METHOD=BG -BLOCK_SIZE=4096 -ALLOCATION=200000 -EXTENSION_COUNT=1024 -GLOBAL_BUFFER_COUNT=4096 -LOCK_SPACE=400 -FILE=$basedir/g/$instance.dat" >> $basedir/etc/db.gde
-echo "a -s TEMP       -ACCESS_METHOD=MM -BLOCK_SIZE=4096 -ALLOCATION=10000 -EXTENSION_COUNT=1024 -GLOBAL_BUFFER_COUNT=4096 -LOCK_SPACE=400 -FILE=$basedir/g/TEMP.dat" >> $basedir/etc/db.gde
+echo "a -s TEMP       -ACCESS_METHOD=MM -BLOCK_SIZE=4096 -ALLOCATION=10000 -EXTENSION_COUNT=1024 -GLOBAL_BUFFER_COUNT=4096 -LOCK_SPACE=400 -FILE=$basedir/g/temp.dat" >> $basedir/etc/db.gde
 echo "c -r DEFAULT    -RECORD_SIZE=16368 -KEY_SIZE=1019 -JOURNAL=(BEFORE_IMAGE,FILE_NAME=\"$basedir/j/$instance.mjl\") -DYNAMIC_SEGMENT=DEFAULT" >> $basedir/etc/db.gde
 echo "a -r TEMP       -RECORD_SIZE=16368 -KEY_SIZE=1019 -NOJOURNAL -DYNAMIC_SEGMENT=TEMP"   >> $basedir/etc/db.gde
 echo "a -n TMP        -r=TEMP"                  >> $basedir/etc/db.gde
@@ -211,13 +211,15 @@ chown $instance:$instance $basedir/etc/db.gde
 # create the global directory
 # TODO redirect output to file
 # have to source the environment first to have GTM env vars available
-su $instance -c "source $basedir/etc/env && \$gtm_dist/mumps -run GDE < $basedir/etc/db.gde"
+su $instance -c "source $basedir/etc/env && \$gtm_dist/mumps -run GDE < $basedir/etc/db.gde > $basedir/log/GDEoutput.log 2>&1"
 
 # Create the database
-su $instance -c "source $basedir/etc/env && \$gtm_dist/mupip create"
+echo "Creating databases"
+su $instance -c "source $basedir/etc/env && \$gtm_dist/mupip create > $basedir/log/createDatabase.log 2>&1"
+echo "Done Creating databases"
 
 # Set permissions
 chown -R $instance:$instance $basedir
 chmod -R g+rw $basedir
 
-echo "Done creating $instance"
+echo "VistA instance $instance created!"

@@ -25,13 +25,10 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Download gtminstall script from SourceForge
-# TODO: kill output
-# TODO: log status
-# TODO; determine if this needs to be logged
-wget http://downloads.sourceforge.net/project/fis-gtm/GT.M%20Installer/v0.12/gtminstall
+echo "Downloading gtminstall"
+curl --remote-name --progress-bar -L http://downloads.sourceforge.net/project/fis-gtm/GT.M%20Installer/v0.12/gtminstall
 
 # Verify hash as we are going to make it executable
-# TODO: get hash and compare
 sha1sum -c --status gtminstall_SHA1
 if [ $? -gt 0 ]; then
     echo "Something went wrong downloading gtminstall"
@@ -73,3 +70,4 @@ fi
 ./gtminstall --ucaseonly-utils --installdir /opt/lsb-gtm/"$gtm_ver"_"$gtm_arch" $gtm_ver
 # remove installgtm script as it is unnecessary
 rm ./gtminstall
+echo "Done installing GT.M"
