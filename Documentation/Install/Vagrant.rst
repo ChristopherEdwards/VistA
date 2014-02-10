@@ -147,11 +147,46 @@ You can also access the VM using another SSH program (ex: PuTTY) by using the
 address as described in the note above and using the correct port 22 for cloud
 installs and 2222 for local VirtualBox installs.
 
+VistA User Accounts
+-------------------
+
+System Manager:
+
+ * Access: SM1234
+
+ * Verify: SM1234!!
+
+Doctor:
+
+ * Access: fakedoc1
+
+ * Verify: 1Doc!@#$
+
+ * Electronic Signature: ROBA123
+
+Nurse:
+
+ * Access: fakenurse1
+
+ * Verify: 1Nur!@#$
+
+ * Electronic Signature: MARYS123
+
+Clerk:
+
+ * Access: fakeclerk1
+
+ * Verify: 1Cle!@#$
+
+ * Electronic Signature: CLERKJ123
+
 Accessing Roll-and-Scroll
 -------------------------
 
 There are two user accounts that are created automatically during the
 installation process that make accessing VistA easier:
+
+Note: by default ${instance} is osehra.
 
 Tied user account
 

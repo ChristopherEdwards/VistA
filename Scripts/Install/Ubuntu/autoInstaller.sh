@@ -35,7 +35,8 @@ usage()
 
     DEFAULTS:
       Alternate VistA-M repo = https://github.com/OSEHRA/VistA-M.git
-      Development Directories = true
+      Install EWD.js = false
+      Create Development Directories = false
       Instance Name = OSEHRA
       Post Install hook = none
       Skip Testing = false
@@ -43,7 +44,8 @@ usage()
     OPTIONS:
       -h    Show this message
       -a    Alternate VistA-M repo (Must be in OSEHRA format)
-      -d    No development directories (s & p)
+      -e    Install EWD.js (assumes development directories)
+      -d    Create development directories (s & p)
       -i    Instance name
       -p    Post install hook (path to script)
       -s    Skip testing
@@ -51,7 +53,7 @@ usage()
 EOF
 }
 
-while getopts ":ha:di:p:s" option
+while getopts ":ha:edi:p:s" option
 do
     case $option in
         h)
@@ -62,7 +64,11 @@ do
             repoPath=$OPTARG
             ;;
         d)
-            developmentDirectories=false
+            developmentDirectories=true
+            ;;
+        e)
+            installEWD=true
+            developmentDirectories=true
             ;;
         i)
             instance=$(echo $OPTARG |tr '[:upper:]' '[:lower:]')
@@ -72,7 +78,7 @@ do
             postInstallScript=$OPTARG
             ;;
         s)
-            skipTesting=true
+            skipTests=true
             ;;
     esac
 done
@@ -83,7 +89,11 @@ if [[ -z $repoPath ]]; then
 fi
 
 if [[ -z $developmentDirectories ]]; then
-    developmentDirectories=true
+    developmentDirectories=false
+fi
+
+if [[ -z $installEWD ]]; then
+    installEWD=false
 fi
 
 if [[ -z $instance ]]; then
@@ -94,16 +104,17 @@ if [[ -z $postInstall ]]; then
     postInstall=false
 fi
 
-if [ -z $skipTesting ]; then
-    skipTesting=false
+if [ -z $skipTests ]; then
+    skipTests=false
 fi
 
 # Summarize options
 echo "Using $repoPath for routines and globals"
 echo "Create development directories: $developmentDirectories"
 echo "Installing an instance named: $instance"
+echo "Installing EWD.js: $installEWD"
 echo "Post install hook: $postInstall"
-echo "Skip Testing: $skipTesting"
+echo "Skip Testing: $skipTests"
 
 # Get primary username if using sudo, default to $username if not sudo'd
 if [[ -n "$SUDO_USER" ]]; then
@@ -126,19 +137,25 @@ export DEBIAN_FRONTEND="noninteractive"
 
 # extra utils - used for cmake and dashboards and initial clones
 # Note: Amazon EC2 requires two apt-get update commands to get everything
-apt-get update -qq
-apt-get update -qq
-apt-get install -qq -y build-essential cmake-curses-gui git
+echo "Updating operating system"
+apt-get update -qq > /dev/null
+apt-get update -qq > /dev/null
+apt-get install -qq -y build-essential cmake-curses-gui git daemon > /dev/null
 
 # Clone repos
 cd /usr/local/src
 git clone -q https://github.com/OSEHRA/VistA -b dashboard VistA-Dashboard
 
-# Need to get our own copy of VistA repository to decouple from vagrant
-git clone -q https://github.com/ChristopherEdwards/VistA -b install-scripts-standalone
+# See if vagrant folder exists if it does use it. if it doesn't clone the repo
+if [ -d /vagrant ]; then
+    scriptdir=/vagrant
+else
+    git clone -q https://github.com/ChristopherEdwards/VistA -b install-scripts-ewd
+    scriptdir=/usr/local/src/VistA/Scripts/Install
+fi
 
 # bootstrap the system
-cd /usr/local/src/VistA/Scripts/Install
+cd $scriptdir
 ./Ubuntu/bootstrapUbuntuServer.sh
 
 # Install GTM
@@ -167,25 +184,25 @@ echo "source $basedir/etc/env" >> $USER_HOME/.bashrc
 # These use the Dashboard branch of the VistA repository
 # The dashboard will clone VistA and VistA-M repos
 # run this as the $instance user
-if  ! $skipTests; then
+if $skipTests; then
+    # Clone VistA-M repo
+    cd /usr/local/src
+    git clone --depth 1 $repoPath VistA-Source
+
+    # Go back to the $basedir
+    cd $basedir
+
+    # Perform the import
+    su $instance -c "source $basedir/etc/env && $scriptdir/GTM/importVistA.sh"
+else
     # create random string for build identification
     # source: http://ubuntuforums.org/showthread.php?t=1775099&p=10901169#post10901169
     export buildid=`tr -dc "[:alpha:]" < /dev/urandom | head -c 8`
 
     # Import VistA and run tests using OSEHRA automated testing framework
-    su $instance -c "source $basedir/etc/env && ctest -S /vagrant/Ubuntu/test.cmake -V"
+    su $instance -c "source $basedir/etc/env && ctest -S $scriptdir/Ubuntu/test.cmake -V"
     # Tell users of their build id
     echo "Your build id is: $buildid you will need this to identify your build on the VistA dashboard"
-else
-    # Clone ght VistA-M repo
-    cd /usr/local/src
-    git clone --depth 1 $repoPath VistA-Source
-
-    # Switch back to where we were
-    cd -
-
-    # Perform the import
-    su $instance -c "source $basedir/etc/env && /usr/local/src/VistA/Scripts/Install/GTM/importVistA.sh"
 fi
 
 # Enable journaling
@@ -196,10 +213,18 @@ service xinetd restart
 
 # Add p and s directories to gtmroutines environment variable
 if $developmentDirectories; then
+    su $instance -c "mkdir $basedir/{p,p/$gtmver,s,s/$gtmver}"
     perl -pi -e 's#export gtmroutines=\"#export gtmroutines=\"\$basedir/p/\$gtmver\(\$basedir/p\) \$basedir/s/\$gtmver\(\$basedir/s\) #' $basedir/etc/env
 fi
 
+# Install EWD.js
+if $installEWD; then
+    cd $scriptdir/EWD
+    ./ewdjs.sh
+    cd $basedir
+fi
+
 # Post install hook
-#if $postInstall; then
-#    su $instance -c "source $basedir/etc/env && $postInstallScript"
-#fi
+if $postInstall; then
+    su $instance -c "source $basedir/etc/env && $postInstallScript"
+fi

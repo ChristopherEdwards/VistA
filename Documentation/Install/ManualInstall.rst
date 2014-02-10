@@ -26,12 +26,22 @@ The script can be downloaded and executed from the git repository:
 
 .. parsed-literal::
 
-    ~$ :usertype:`curl https://raw.github.com/OSEHRA/VistA/master/Scripts/Install/Ubuntu/autoInstaller.sh | bash`
+    ~$ :usertype:`curl https://raw.github.com/OSEHRA/VistA/master/Scripts/Install/Ubuntu/autoInstaller.sh | sudo bash`
 
 This will download and execute the autoInstaller script using the defaults
-embedded in the script. A full explanation of the command-line options of
-autoInstaller.sh is available.
+embedded in the script.
 
-.. _`Amazon Web Services`: http://aws.amazon.com/
-.. _`autoInstaller.sh`: autoInstaller.rst
-.. _Vagrant: Vagrant.rst
+If you would like to use some of the command line options you can do the
+following:
+
+.. parsed-literal::
+
+     ~$ :usertype:`curl --remote-name https://raw.github.com/OSEHRA/VistA/master/Scripts/Install/Ubuntu/autoInstaller.sh`
+
+A full explanation of the command-line options of autoInstaller.sh is
+available by typing `./autoInstaller.sh -h`.
+
+Irregardless of the option selected you will have to logout and back in for certain changes to take effect.
+
+Note: if you use the skip testing step no configuration will be done and you
+will have to add all of the required users and patients for your configuration.

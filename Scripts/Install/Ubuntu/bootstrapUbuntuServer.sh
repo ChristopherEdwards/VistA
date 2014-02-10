@@ -22,9 +22,8 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Update the server from repositories
-apt-get -y -qq update
-apt-get -y -qq upgrade
+apt-get -y -qq update > /dev/null
+apt-get -y -qq upgrade > /dev/null
 
 # Install baseline packages
-# TODO: detect virtualbox and install additions?
-apt-get install -y -qq git xinetd perl wget ssh
+apt-get install -y -qq git xinetd perl wget ssh > /dev/null

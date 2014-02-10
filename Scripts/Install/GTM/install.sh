@@ -68,6 +68,10 @@ fi
 # --ucaseonly-utils - override default to install only uppercase utilities
 #                     this follows VistA convention of uppercase only routines
 ./gtminstall --ucaseonly-utils --installdir /opt/lsb-gtm/"$gtm_ver"_"$gtm_arch" $gtm_ver
-# remove installgtm script as it is unnecessary
+# Remove installgtm script as it is unnecessary
 rm ./gtminstall
+
+# Link GT.M shared library where the linker can find it and refresh the cache
+ln -s /opt/lsb-gtm/"$gtm_ver"_"$gtm_arch"/libgtmshr.so /usr/local/lib
+ldconfig
 echo "Done installing GT.M"
